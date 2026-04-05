@@ -45,10 +45,32 @@ const Estoque = () => {
 
         <div className="bg-white p-4 rounded-lg shadow space-y-3">
           <h3 className="font-bold">Adicionar Peça</h3>
-          <input className="border p-2 rounded w-full" placeholder="Nome da peça" value={nome} onChange={e => setNome(e.target.value)} />
-          <input className="border p-2 rounded w-full" placeholder="Categoria" value={categoria} onChange={e => setCategoria(e.target.value)} />
-          <input className="border p-2 rounded w-full" type="number" placeholder="Quantidade" value={quantidade} onChange={e => setQuantidade(Number(e.target.value))} />
-          <input className="border p-2 rounded w-full" type="number" placeholder="Preço" value={preco} onChange={e => setPreco(Number(e.target.value))} />
+          <input
+            className="border p-2 rounded w-full"
+            placeholder="Nome da peça"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+          />
+          <input
+            className="border p-2 rounded w-full"
+            placeholder="Categoria"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+          />
+          <input
+            className="border p-2 rounded w-full"
+            type="number"
+            placeholder="Quantidade"
+            value={quantidade}
+            onChange={(e) => setQuantidade(Number(e.target.value))}
+          />
+          <input
+            className="border p-2 rounded w-full"
+            type="number"
+            placeholder="Preço"
+            value={preco}
+            onChange={(e) => setPreco(Number(e.target.value))}
+          />
           <Button onClick={adicionarProduto}>Adicionar</Button>
         </div>
 
@@ -63,7 +85,7 @@ const Estoque = () => {
             </tr>
           </thead>
           <tbody>
-            {produtos.map(p => (
+            {produtos.map((p) => (
               <tr key={p.id} className="border-b">
                 <td className="p-3">{p.nome}</td>
                 <td className="p-3">{p.categoria}</td>
