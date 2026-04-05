@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,28 +13,31 @@ interface Cliente {
   status: string;
   telefone: string | null;
   descricao: string | null;
+  user_id?: string;
 }
 
 const isPago = (s: string | null | undefined) => s?.toLowerCase() === "pago";
 
 const Fiado = () => {
+  const { user } = useAuth();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [nome, setNome] = useState("");
   const [valor, setValor] = useState(0);
   const [telefone, setTelefone] = useState("");
   const [descricao, setDescricao] = useState("");
 
-  const carregarClientes = async () => {
-    const { data } = await supabase.from("clientes_fiado").select("*");
+  const carregarClientes = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase.from("clientes_fiado").select("*").eq("user_id", user.id);
     if (data) setClientes(data as Cliente[]);
-  };
+  }, [user]);
 
   useEffect(() => {
     carregarClientes();
-  }, []);
+  }, [carregarClientes]);
 
   const adicionarCliente = async () => {
-    if (!nome) return;
+    if (!user || !nome) return;
     await supabase.from("clientes_fiado").insert([
       {
         nome,
@@ -41,6 +45,7 @@ const Fiado = () => {
         telefone: telefone || null,
         descricao: descricao || null,
         status: "pendente",
+        user_id: user.id,
       },
     ]);
     setNome("");
@@ -51,7 +56,12 @@ const Fiado = () => {
   };
 
   const marcarPago = async (id: string) => {
-    await supabase.from("clientes_fiado").update({ status: "pago" }).eq("id", id);
+    if (!user) return;
+    await supabase
+      .from("clientes_fiado")
+      .update({ status: "pago" })
+      .eq("id", id)
+      .eq("user_id", user.id);
     carregarClientes();
   };
 

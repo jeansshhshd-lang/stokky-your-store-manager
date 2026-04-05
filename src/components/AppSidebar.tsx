@@ -1,8 +1,12 @@
-import { LayoutDashboard, Package, HandCoins } from "lucide-react";
+import { LayoutDashboard, LogOut, Package, HandCoins } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
@@ -12,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Painel", url: "/", icon: LayoutDashboard },
   { title: "Estoque", url: "/estoque", icon: Package },
   { title: "Fiado", url: "/fiado", icon: HandCoins },
 ];
@@ -20,6 +24,13 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSair = async () => {
+    await signOut();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -54,6 +65,18 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border p-2">
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+          onClick={handleSair}
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!collapsed && <span>Sair</span>}
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }

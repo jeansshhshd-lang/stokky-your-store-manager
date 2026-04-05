@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,6 +35,7 @@ const fmtBRL = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const Index = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [totalEstoqueValor, setTotalEstoqueValor] = useState(0);
   const [totalPecas, setTotalPecas] = useState(0);
@@ -43,13 +45,18 @@ const Index = () => {
   const [ultimosFiado, setUltimosFiado] = useState<ClienteFiadoRow[]>([]);
 
   useEffect(() => {
+    if (!user) return;
+
     let cancelled = false;
 
     async function load() {
       setLoading(true);
       const [prodRes, fiadoRes] = await Promise.all([
-        supabase.from("produtos").select("quantidade, preco"),
-        supabase.from("clientes_fiado").select("id, nome, valor, data, status"),
+        supabase.from("produtos").select("quantidade, preco").eq("user_id", user.id),
+        supabase
+          .from("clientes_fiado")
+          .select("id, nome, valor, data, status")
+          .eq("user_id", user.id),
       ]);
 
       if (cancelled) return;
@@ -95,7 +102,7 @@ const Index = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   const stats = [
     {
@@ -128,7 +135,7 @@ const Index = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Painel</h2>
           <p className="text-muted-foreground">Visão geral da sua loja</p>
         </div>
 

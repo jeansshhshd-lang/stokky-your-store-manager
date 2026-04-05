@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AlertTriangle } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,9 +24,11 @@ interface Produto {
   status: string;
   tamanho: string;
   estoque_minimo: number;
+  user_id?: string;
 }
 
 const Estoque = () => {
+  const { user } = useAuth();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [nome, setNome] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -34,19 +37,28 @@ const Estoque = () => {
   const [tamanho, setTamanho] = useState<string>("M");
   const [estoqueMinimo, setEstoqueMinimo] = useState(0);
 
-  const carregarProdutos = async () => {
-    const { data } = await supabase.from("produtos").select("*");
+  const carregarProdutos = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase.from("produtos").select("*").eq("user_id", user.id);
     if (data) setProdutos(data as Produto[]);
-  };
+  }, [user]);
 
   useEffect(() => {
     carregarProdutos();
-  }, []);
+  }, [carregarProdutos]);
 
   const adicionarProduto = async () => {
-    if (!nome) return;
+    if (!user || !nome) return;
     await supabase.from("produtos").insert([
-      { nome, categoria, quantidade, preco, tamanho, estoque_minimo: estoqueMinimo },
+      {
+        nome,
+        categoria,
+        quantidade,
+        preco,
+        tamanho,
+        estoque_minimo: estoqueMinimo,
+        user_id: user.id,
+      },
     ]);
     setNome("");
     setCategoria("");
