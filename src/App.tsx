@@ -6,12 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicOnlyRoute } from "@/components/PublicOnlyRoute";
-import Index from "./pages/Index.tsx";
-import Estoque from "./pages/Estoque.tsx";
-import Fiado from "./pages/Fiado.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Login from "./pages/Login.tsx";
-import Cadastro from "./pages/Cadastro.tsx";
+import Index from "@/pages/Index";
+import Estoque from "@/pages/Estoque";
+import Fiado from "@/pages/Fiado";
+import NotFound from "@/pages/NotFound";
+import Login from "@/pages/Login";
+import Cadastro from "@/pages/Cadastro";
 
 const queryClient = new QueryClient();
 
